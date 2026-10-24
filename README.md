@@ -4,7 +4,7 @@ An English portfolio built with Next.js and React. Page content, styles, navigat
 
 ## Local development
 
-Requires Node.js 22.13 or later and npm.
+Use Node.js **22.23.3** (see `.nvmrc`) and npm **10.9.9** (`packageManager` in `package.json`). GitHub Actions pins the same versions. With nvm, run `nvm install` and `nvm use` before installing dependencies.
 
 ```sh
 npm ci
@@ -49,3 +49,8 @@ GitHub Pages cannot refresh screenshots at runtime. After adding images or makin
 ## Dependency checks
 
 Run `npm audit --omit=dev` for production packages. The release preparation check found no production vulnerabilities. The full development audit still reports three moderate findings in Tailwind 3's selector-parser dependency chain; resolving them through npm's suggested fix requires a Tailwind 4 migration. These affect the CSS build tooling, which processes this repository's checked-in styles. That separate migration is not included here.
+
+
+## Updating the lock file
+
+Use the pinned Node.js/npm versions. If a lock-file repair is needed, copy `package.json` and `package-lock.json` into a clean temporary directory without `node_modules`, then run `npm install --package-lock-only --ignore-scripts` there. Copy the resulting lock file back and verify `npm ci`, lint, build and typecheck. A successful install with an existing local dependency tree is not sufficient to validate a cross-platform CI lock file.
