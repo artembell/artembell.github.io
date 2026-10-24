@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Artem Belyavsky — portfolio
 
-## Getting Started
+An English portfolio built with Next.js and React. Page content, styles, navigation and the screenshot viewer live in `src/app/page.tsx`.
 
-First, run the development server:
+## Local development
 
-```bash
+Requires Node.js 22.13 or later and npm.
+
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production build and preview
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```sh
+npm run lint
+npm run build
+npm run typecheck
+npm start
+```
 
-## Learn More
+The build exports the complete static website to `out/`. The local preview uses Python 3 to serve that directory on http://localhost:3000. There is no Next.js server to run in production: deploy the contents of `out/` to a static host.
 
-To learn more about Next.js, take a look at the following resources:
+## Publish to GitHub Pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The repository is configured for https://artembell.github.io/.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. In the repository's **Settings → Pages**, select **GitHub Actions** as the source.
+2. Push the reviewed changes to `master`, or run **Deploy Next.js site to Pages** manually from the Actions tab.
+3. The workflow installs the locked dependencies, runs lint, builds and typechecks, then deploys only `out/`.
 
-## Deploy on Vercel
+No deployment is triggered by a local commit. If the site moves to a custom domain, update `siteUrl` in `src/app/page.tsx`, `public/robots.txt` and `public/sitemap.xml` before building.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project repositories and screenshots
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Set a project's `repository` in `personalProjects` to `owner/repository`. Leave it `null` while the source should not be linked. Browser agent harness is configured as `artembell/oh-my-tabs`; video analysis intentionally has no repository configured yet.
+
+During the build, the site checks GitHub's public API without credentials. It displays repository links only for publicly accessible repositories, and reads screenshots from their `demo/images` directory on the default branch. Supported formats: PNG, JPG, JPEG, WebP, AVIF and GIF. Files are ordered by name; use prefixes such as `01-` and `02-` to control the order. Filenames become captions.
+
+A missing/empty image directory, private repository or unavailable GitHub API produces no gallery or placeholder. There are no bundled test screenshots. GitHub API failures do not stop the portfolio build, so check the built page if expected images are missing.
+
+Each card shows up to three small, uncropped thumbnails in its bottom-right corner. `+ N more` reveals the rest, and `Show less` collapses them. Clicking a thumbnail opens all available images in the full-size viewer. Keep uploaded screenshots small because static hosting serves the original images without an image optimization server.
+
+GitHub Pages cannot refresh screenshots at runtime. After adding images or making a repository public, run the deployment workflow again. No token is required, and the portfolio does not modify any project repository.
+
+## Dependency checks
+
+Run `npm audit --omit=dev` for production packages. The release preparation check found no production vulnerabilities. The full development audit still reports three moderate findings in Tailwind 3's selector-parser dependency chain; resolving them through npm's suggested fix requires a Tailwind 4 migration. These affect the CSS build tooling, which processes this repository's checked-in styles. That separate migration is not included here.
